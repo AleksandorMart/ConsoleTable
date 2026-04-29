@@ -100,10 +100,12 @@ def parse_date(date_str):
     date_str = date_str.strip()
     
     # Try to parse various date formats
-    parts = re.split(r'[-./\\: ]', date_str)
-    
-    if len(parts) != 6:
-        return "0000-00-00 00:00:00" # parts #
+    mono_date = re.sub(r'[-./\\: TТ]', '', date_str)
+    parts = re.findall(r'^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$', mono_date)[0]
+
+    if len(parts) != 6: #
+        return "0000-00-00 00:00:00"
+        
     
     try:
         # Try to identify which part is year (4 digits)
@@ -120,7 +122,6 @@ def parse_date(date_str):
         other_parts = [p for i, p in enumerate(parts) if i != year_idx]
         if len(other_parts) < 2:
             return "0000-00-00 00:00:00"
-        #elif 
         try:
             val1 = int(other_parts[0])
             val2 = int(other_parts[1])

@@ -1,0 +1,54 @@
+# === Python core ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# === Distribution / packaging ===
+build/
+dist/
+*.egg-info/
+*.egg
+*.spec
+.Python
+
+# === Virtual environments ===
+.venv/
+venv/
+env/
+ENV/
+*.env
+.pytest_cache/
+.coverage
+htmlcov/
+
+# === IDE / Editor ===
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.ipynb_checkpoints
+tempCodeRunnerFile.py
+
+# === Type checkers / linters ===
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+
+# === OS / System ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Project-specific ===
+# Входные данные (если не коммитите sample-файлы)
+# *.txt
+data1.txt
+# !README.md
+# !requirements.txt
+
+# Логи и временные файлы
+*.log
+tmp/
+temp/

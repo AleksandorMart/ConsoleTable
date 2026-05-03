@@ -157,14 +157,30 @@ def parse_date(date_str):
     except Exception:
         return "0000-00-00 00:00:00"
 
-
+'''
 def read_file_line_by_line(file_path, encoding):
     """Generator to read file line by line for memory efficiency."""
     with open(file_path, 'r', encoding=encoding, errors='replace') as f:
         for line in f:
             yield line.rstrip('\n\r')
+'''
 
 
+def read_file_line_by_line(file_path, encoding):
+    """Генератор, который читает файл и исправляет 'кракозябры' на лету."""
+    with open(file_path, 'r', encoding=encoding, errors='replace') as f:
+        for line in f:
+            clean_line = line.rstrip('\n\r')
+            try:
+                # Пытаемся починить строку, если это UTF-8, ошибочно прочитанный как latin-1/cp1252
+                # Мы используем cp1252, так как она чаще всего порождает такие "Р Сџ"
+                fixed_line = clean_line.encode('cp1252').decode('utf-8')
+                yield fixed_line
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                # Если починить не удалось (строка уже нормальная), отдаем как есть
+                yield clean_line
+
+'''
 def read_url_line_by_line(url):
     """Generator to read URL content line by line."""
     if not HAS_REQUESTS:
@@ -180,6 +196,33 @@ def read_url_line_by_line(url):
     
     for line in response.iter_lines(decode_unicode=True):
         if line:
+            yield line
+'''
+
+def read_url_line_by_line(url):
+    """Генератор для чтения URL с исправлением 'кракозябр' на лету."""
+    if not HAS_REQUESTS:
+        print("Ошибка: библиотека 'requests' обязательна", file=sys.stderr)
+        sys.exit(1)
+    
+    # Открываем поток (stream=True)
+    response = requests.get(url, stream=True, timeout=30)
+    response.raise_for_status()
+    
+    # Если кодировка не определена, используем latin-1 (она сохраняет байты для исправления)
+    if response.encoding is None or response.encoding == 'ISO-8859-1':
+        response.encoding = 'cp1252' 
+
+    for line in response.iter_lines(decode_unicode=True):
+        if not line:
+            continue
+            
+        try:
+            # Пытаемся починить строку, если это UTF-8, застрявший в cp1252
+            fixed_line = line.encode('cp1252').decode('utf-8')
+            yield fixed_line
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            # Если строка уже нормальная или содержит другие символы
             yield line
 
 
